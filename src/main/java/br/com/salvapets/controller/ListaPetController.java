@@ -10,6 +10,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.JOptionPane;
+
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -317,52 +319,10 @@ public class ListaPetController implements Initializable {
                     inputIdade.setText(String.valueOf(petSelecionado.getIdade()));
                     inputHistoria.setText(String.valueOf(petSelecionado.getHistoria()));
                     inputSexo.setText(String.valueOf(petSelecionado.getSexo()));
-
-                    if (petSelecionado != null) {
-                        // Exibir a imagem em um ImageView
-                        exibirImagem(petSelecionado.getImagem());
-                    }
                 }
             }
         });
 
-    }
-
-    @FXML
-    void atualizarEdit(ActionEvent event) {
-
-    }
-
-    private void exibirImagem(byte[] imagemBytes) {
-        // Verificar se há bytes de imagem
-        if (imagemBytes != null && imagemBytes.length > 0) {
-            // Converter o array de bytes para um objeto Image
-            Image imagem = new Image(new ByteArrayInputStream(imagemBytes));
-    
-            // Criar um novo ImageView
-            ImageView imageView = new ImageView(imagem);
-    
-            // Adicionar o ImageView ao seu Pane de exibição (substitua seuPaneDeExibicao pelo seu Pane real)
-            seuPaneDeExibicao.getChildren().setAll(imageView);
-        }
-    }
-
-    @FXML
-    void handlebuttonSalvarListar(ActionEvent event) {
-        ObservableList<Pet> petsEditados = tabListaTudo.getItems();
-
-        for (Pet pet : petsEditados) {
-            // Chama o método atualizarRegistro para cada pet editado
-            operacoesCRUD.atualizarRegistro(pet);
-        }
-
-        System.out.println("Executando a lógica de salvar alterações");
-    }
-
-    // Método para popular o ComboBox
-    private void popularComboBox() {
-        ObservableList<String> opcoes = FXCollections.observableArrayList("Macho", "Femea");
-        campoSexo.setItems(opcoes);
     }
 
     @FXML
@@ -395,6 +355,56 @@ public class ListaPetController implements Initializable {
             }
         }
 
+    }
+
+    @FXML
+    void atualizarEdit(ActionEvent event) {
+        Pet itemSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
+        if (itemSelecionado != null) {
+            int idEdit = itemSelecionado.getId();
+            pet.setId(idEdit);
+            pet.setNome(inputNome.getText());
+            pet.setRaca(inputRaca.getText());
+            pet.setPorteRaca(inputTamanho.getText());
+            pet.setSexo(inputSexo.getText());
+            pet.setCor(inputCor.getText());
+            pet.setIdade(inputIdade.getText());
+            pet.setHistoria(inputHistoria.getText());
+            operacoesCRUD.atualizarRegistro(pet);
+            JOptionPane.showMessageDialog(null, "Update!");
+        }    
+    }
+
+    // private void exibirImagem(byte[] imagemBytes) {
+    //     // Verificar se há bytes de imagem
+    //     if (imagemBytes != null && imagemBytes.length > 0) {
+    //         // Converter o array de bytes para um objeto Image
+    //         Image imagem = new Image(new ByteArrayInputStream(imagemBytes));
+    
+    //         // Criar um novo ImageView
+    //         ImageView imageView = new ImageView(imagem);
+    
+    //         // Adicionar o ImageView ao seu Pane de exibição (substitua seuPaneDeExibicao pelo seu Pane real)
+    //         seuPaneDeExibicao.getChildren().setAll(imageView);
+    //     }
+    // }
+
+    // @FXML
+    // void handlebuttonSalvarListar(ActionEvent event) {
+    //     ObservableList<Pet> petsEditados = tabListaTudo.getItems();
+
+    //     for (Pet pet : petsEditados) {
+    //         // Chama o método atualizarRegistro para cada pet editado
+    //         operacoesCRUD.atualizarRegistro(pet);
+    //     }
+
+    //     System.out.println("Executando a lógica de salvar alterações");
+    // }
+
+    // Método para popular o ComboBox
+    private void popularComboBox() {
+        ObservableList<String> opcoes = FXCollections.observableArrayList("Macho", "Femea");
+        campoSexo.setItems(opcoes);
     }
 
     @FXML

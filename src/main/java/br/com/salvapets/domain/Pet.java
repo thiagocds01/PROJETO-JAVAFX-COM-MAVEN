@@ -2,7 +2,7 @@ package br.com.salvapets.domain;
 
 
 public class Pet {
-    private int id;
+    private Integer id;
     private String nome;
     private String raca;
     private String porteRaca;
@@ -24,7 +24,7 @@ public class Pet {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

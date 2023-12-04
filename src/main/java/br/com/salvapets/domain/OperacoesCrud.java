@@ -6,6 +6,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 public class OperacoesCrud {
 
     public List<Pet> listarRegistros() {
@@ -69,22 +71,33 @@ public class OperacoesCrud {
 
     public void atualizarRegistro(Pet pet) {
         try (Connection conexao = Conexao.conectar()) {
-            String sql = "UPDATE pet SET nome=?, raca=?, porteRaca=?, sexo=?, cor=?, idade=?, historia=?, imagem=? WHERE id=?";
+            String sql = "UPDATE 'pet' SET id= '"+pet.getId()+"'"
+            + "'nome'=?,"
+            + "'raca'=?,"
+            + "'porteRaca'=?,"
+            + "'sexo'=?,"
+            + "'cor'=?,"
+            + "'idade'=?,"
+            + "'historia'=?," 
+            + "'imagem'=? WHERE id= '"+pet.getId()+"'";
             try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+                // stmt.setInt(1, pet.getId());
                 stmt.setString(1, pet.getNome());
                 stmt.setString(2, pet.getRaca());
                 stmt.setString(3, pet.getPorteRaca());
                 stmt.setString(4, pet.getSexo());
                 stmt.setString(5, pet.getCor());
                 stmt.setString(6, pet.getIdade());
-                stmt.setString(7, pet.getHistoria());
-                stmt.setBytes(8, pet.getImagem());
-                // stmt.setInt(9, pet.getId());
-                stmt.executeUpdate();
+                stmt.setString(7, pet.getHistoria());  
 
+                Blob imagemBlob = conexao.createBlob();
+                imagemBlob.setBytes(1, pet.getImagem());
+                stmt.setBlob(8, imagemBlob);
+                stmt.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao atualizar pet: " + e.getMessage());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+            ;
         }
     }
 
