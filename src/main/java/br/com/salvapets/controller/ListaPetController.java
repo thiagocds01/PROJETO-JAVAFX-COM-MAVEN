@@ -2,6 +2,9 @@ package br.com.salvapets.controller;
 
 import javafx.scene.layout.StackPane;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,8 +15,9 @@ import java.util.ResourceBundle;
 
 import javax.swing.JOptionPane;
 
+import com.mysql.cj.jdbc.Blob;
+
 import javafx.event.EventHandler;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
 import br.com.salvapets.domain.OperacoesCrud;
@@ -187,8 +191,8 @@ public class ListaPetController implements Initializable {
     @FXML
     private TextField inputTamanho;
 
-    private StackPane seuPaneDeExibicao;
-
+    @FXML
+    private ImageView imgMostrar;
 
     private OperacoesCrud operacoesCRUD = new OperacoesCrud();
     private Pet pet = new Pet();
@@ -213,13 +217,10 @@ public class ListaPetController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new ExtensionFilter("Imagens", "*.png", "*.jpg", "*.jpeg", "*.gif"));
 
-        // Abre o diálogo de seleção de arquivo
         File file = fileChooser.showOpenDialog(new Stage());
 
         if (file != null) {
             try {
-                // Lê o arquivo para um array de bytes
-                // byte[] bytesDaImagem = Files.readAllBytes(file.toPath());
                 FileInputStream fileInputStream = new FileInputStream(file);
                 Integer numBytes = fileInputStream.available();
                 byte[] imagemByte = new byte[numBytes];
@@ -232,12 +233,11 @@ public class ListaPetController implements Initializable {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                // Lidar com a exceção, por exemplo, mostrar uma mensagem de erro
                 System.out.println("Erro ao ler o arquivo: " + e.getMessage());
             }
         }
     }
-    //Botão Cancelar irá limpar os campos
+
     @FXML
     void handleButtonCancelar(ActionEvent event) {
         campoNome.setText("");
@@ -248,8 +248,6 @@ public class ListaPetController implements Initializable {
         campoDtNascimento.setText("");
         campoHistoria.setText("");
     }
-
-
 
     @FXML
     void handleButtonSalvar(ActionEvent event) {
@@ -264,6 +262,7 @@ public class ListaPetController implements Initializable {
 
         System.out.println(pet.getImagem());
 
+        JOptionPane.showMessageDialog(null, "Cadastrado!");
         operacoesCRUD.cadastrarRegistro(pet);
 
     }
@@ -271,7 +270,6 @@ public class ListaPetController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        // Chame o método para popular o ComboBox
         popularComboBox();
 
         List<Pet> pets = operacoesCRUD.listarRegistros();
@@ -293,25 +291,16 @@ public class ListaPetController implements Initializable {
         colRaca.setCellValueFactory(new PropertyValueFactory<Pet, String>("raca"));
         colImagem.setCellValueFactory(new PropertyValueFactory<Pet, byte[]>("imagem"));
 
-        colNome.setCellFactory(TextFieldTableCell.forTableColumn());
-        colCor.setCellFactory(TextFieldTableCell.forTableColumn());
-        colSexo.setCellFactory(TextFieldTableCell.forTableColumn());
-        colIdade.setCellFactory(TextFieldTableCell.forTableColumn());
-        colRaca.setCellFactory(TextFieldTableCell.forTableColumn());
-        colHistoria.setCellFactory(TextFieldTableCell.forTableColumn());
-
         tabListaTudo.getColumns().addAll(colId, colNome, colCor, colSexo, colIdade, colRaca, colImagem);
 
         tabListaTudo.getItems().addAll(pets);
 
-        // Adicionar um EventHandler para lidar com o clique na linha
         tabListaTudo.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getClickCount() == 1) {
-                    // Obter a linha selecionada
                     Pet petSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
-                    inputID.setText(String.valueOf(petSelecionado.getId()));;
+                    inputID.setText(String.valueOf(petSelecionado.getId()));
                     inputNome.setText(String.valueOf(petSelecionado.getNome()));
                     inputRaca.setText(String.valueOf(petSelecionado.getRaca()));
                     inputTamanho.setText(String.valueOf(petSelecionado.getPorteRaca()));
@@ -319,9 +308,42 @@ public class ListaPetController implements Initializable {
                     inputIdade.setText(String.valueOf(petSelecionado.getIdade()));
                     inputHistoria.setText(String.valueOf(petSelecionado.getHistoria()));
                     inputSexo.setText(String.valueOf(petSelecionado.getSexo()));
+
                 }
             }
         });
+
+    }
+
+    @FXML
+    void imgMostrar() {
+        tabListaTudo.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getClickCount() == 1) {
+                    Pet petSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
+
+                    Image imagem = convertByteArrayToImage(petSelecionado.getImagem());
+
+                    imgMostrar.setImage(imagem);
+
+                }
+            }
+        });
+    }
+
+    private Image convertByteArrayToImage(byte[] byteArray) {
+        try {
+            ByteArrayInputStream bis = new ByteArrayInputStream(byteArray);
+            Image imagem = new Image(bis);
+
+            bis.close();
+
+            return imagem;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
 
     }
 
@@ -331,13 +353,10 @@ public class ListaPetController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new ExtensionFilter("Imagens", "*.png", "*.jpg", "*.jpeg", "*.gif"));
 
-        // Abre o diálogo de seleção de arquivo
         File file = fileChooser.showOpenDialog(new Stage());
 
         if (file != null) {
             try {
-                // Lê o arquivo para um array de bytes
-                // byte[] bytesDaImagem = Files.readAllBytes(file.toPath());
                 FileInputStream fileInputStream = new FileInputStream(file);
                 Integer numBytes = fileInputStream.available();
                 byte[] imagemByte = new byte[numBytes];
@@ -350,7 +369,6 @@ public class ListaPetController implements Initializable {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                // Lidar com a exceção, por exemplo, mostrar uma mensagem de erro
                 System.out.println("Erro ao ler o arquivo: " + e.getMessage());
             }
         }
@@ -371,37 +389,13 @@ public class ListaPetController implements Initializable {
             pet.setIdade(inputIdade.getText());
             pet.setHistoria(inputHistoria.getText());
             operacoesCRUD.atualizarRegistro(pet);
-            JOptionPane.showMessageDialog(null, "Update!");
-        }    
+            JOptionPane.showMessageDialog(null, "Atualizado!");
+
+            System.out.println("id" + idEdit);
+        }
     }
 
-    // private void exibirImagem(byte[] imagemBytes) {
-    //     // Verificar se há bytes de imagem
-    //     if (imagemBytes != null && imagemBytes.length > 0) {
-    //         // Converter o array de bytes para um objeto Image
-    //         Image imagem = new Image(new ByteArrayInputStream(imagemBytes));
-    
-    //         // Criar um novo ImageView
-    //         ImageView imageView = new ImageView(imagem);
-    
-    //         // Adicionar o ImageView ao seu Pane de exibição (substitua seuPaneDeExibicao pelo seu Pane real)
-    //         seuPaneDeExibicao.getChildren().setAll(imageView);
-    //     }
-    // }
 
-    // @FXML
-    // void handlebuttonSalvarListar(ActionEvent event) {
-    //     ObservableList<Pet> petsEditados = tabListaTudo.getItems();
-
-    //     for (Pet pet : petsEditados) {
-    //         // Chama o método atualizarRegistro para cada pet editado
-    //         operacoesCRUD.atualizarRegistro(pet);
-    //     }
-
-    //     System.out.println("Executando a lógica de salvar alterações");
-    // }
-
-    // Método para popular o ComboBox
     private void popularComboBox() {
         ObservableList<String> opcoes = FXCollections.observableArrayList("Macho", "Femea");
         campoSexo.setItems(opcoes);
@@ -412,9 +406,8 @@ public class ListaPetController implements Initializable {
         Pet itemSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
 
         if (itemSelecionado != null) {
-            int idParaExcluir = itemSelecionado.getId(); // Correção aqui
+            int idParaExcluir = itemSelecionado.getId(); 
             operacoesCRUD.excluirRegistro(idParaExcluir);
-            // Atualizar a TableView
             tabListaTudo.getItems().remove(itemSelecionado);
             System.out.println(idParaExcluir);
         }

@@ -54,13 +54,11 @@ public class OperacoesCrud {
                 stmt.setString(5, pet.getCor());
                 stmt.setString(6, pet.getIdade());
                 stmt.setString(7, pet.getHistoria());
-                //Thiago fiz essa alteração para a imagem, lembrar de no banco de dados definir a imagem tipo MEDIUMBLOB
                 Blob imagemBlob = conexao.createBlob();
                 imagemBlob.setBytes(1, pet.getImagem());
                 stmt.setBlob(8, imagemBlob);
 
 
-                // Configure outros parâmetros conforme necessário
 
                 stmt.executeUpdate();
             }
@@ -69,19 +67,11 @@ public class OperacoesCrud {
         }
     }
 
+
     public void atualizarRegistro(Pet pet) {
         try (Connection conexao = Conexao.conectar()) {
-            String sql = "UPDATE 'pet' SET id= '"+pet.getId()+"'"
-            + "'nome'=?,"
-            + "'raca'=?,"
-            + "'porteRaca'=?,"
-            + "'sexo'=?,"
-            + "'cor'=?,"
-            + "'idade'=?,"
-            + "'historia'=?," 
-            + "'imagem'=? WHERE id= '"+pet.getId()+"'";
+            String sql = "UPDATE pet SET nome=?, raca=?, porteRaca=?, sexo=?, cor=?, idade=?, historia=?, imagem=? WHERE id="+ pet.getId();
             try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
-                // stmt.setInt(1, pet.getId());
                 stmt.setString(1, pet.getNome());
                 stmt.setString(2, pet.getRaca());
                 stmt.setString(3, pet.getPorteRaca());
