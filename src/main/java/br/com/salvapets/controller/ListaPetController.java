@@ -251,21 +251,40 @@ public class ListaPetController implements Initializable {
 
     @FXML
     void handleButtonSalvar(ActionEvent event) {
+        String nome = campoNome.getText();
+        String raca = campoRaca.getText();
+        String porteRaca = campoPorteRaca.getText();
+        String sexo = campoSexo.getValue();
+        String cor = campoCor.getText();
+        String idade = campoDtNascimento.getText();
+        String historia = campoHistoria.getText();
 
-        pet.setNome(campoNome.getText());
-        pet.setRaca(campoRaca.getText());
-        pet.setPorteRaca(campoPorteRaca.getText());
-        pet.setSexo(campoSexo.getValue());
-        pet.setCor(campoCor.getText());
-        pet.setIdade(campoDtNascimento.getText());
-        pet.setHistoria(campoHistoria.getText());
+        if (nome.trim().isEmpty() ||
+                raca.trim().isEmpty() ||
+                porteRaca.trim().isEmpty() ||
+                sexo == null || sexo.trim().isEmpty() ||
+                cor.trim().isEmpty() ||
+                idade.trim().isEmpty() ||
+                historia.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Todos os campos são obrigatórios e não podem estar em branco.");
+            return;
+        }
+
+        pet.setNome(nome);
+        pet.setRaca(raca);
+        pet.setPorteRaca(porteRaca);
+        pet.setSexo(sexo);
+        pet.setCor(cor);
+        pet.setIdade(idade);
+        pet.setHistoria(historia);
 
         System.out.println(pet.getImagem());
 
+
         JOptionPane.showMessageDialog(null, "Cadastrado!");
         operacoesCRUD.cadastrarRegistro(pet);
-
     }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -274,7 +293,6 @@ public class ListaPetController implements Initializable {
 
         List<Pet> pets = operacoesCRUD.listarRegistros();
 
-        TableColumn<Pet, Integer> colId = new TableColumn<>("ID");
         TableColumn<Pet, String> colNome = new TableColumn<>("Nome");
         TableColumn<Pet, String> colCor = new TableColumn<>("Cor");
         TableColumn<Pet, String> colHistoria = new TableColumn<>("Historia");
@@ -283,7 +301,6 @@ public class ListaPetController implements Initializable {
         TableColumn<Pet, String> colRaca = new TableColumn<>("Raca");
         TableColumn<Pet, byte[]> colImagem = new TableColumn<>("Imagem");
 
-        colId.setCellValueFactory(new PropertyValueFactory<Pet, Integer>("id"));
         colNome.setCellValueFactory(new PropertyValueFactory<Pet, String>("nome"));
         colCor.setCellValueFactory(new PropertyValueFactory<Pet, String>("cor"));
         colSexo.setCellValueFactory(new PropertyValueFactory<Pet, String>("sexo"));
@@ -291,7 +308,7 @@ public class ListaPetController implements Initializable {
         colRaca.setCellValueFactory(new PropertyValueFactory<Pet, String>("raca"));
         colImagem.setCellValueFactory(new PropertyValueFactory<Pet, byte[]>("imagem"));
 
-        tabListaTudo.getColumns().addAll(colId, colNome, colCor, colSexo, colIdade, colRaca, colImagem);
+        tabListaTudo.getColumns().addAll(colNome, colCor, colSexo, colIdade, colRaca, colImagem);
 
         tabListaTudo.getItems().addAll(pets);
 
@@ -300,7 +317,6 @@ public class ListaPetController implements Initializable {
             public void handle(MouseEvent event) {
                 if (event.getClickCount() == 1) {
                     Pet petSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
-                    inputID.setText(String.valueOf(petSelecionado.getId()));
                     inputNome.setText(String.valueOf(petSelecionado.getNome()));
                     inputRaca.setText(String.valueOf(petSelecionado.getRaca()));
                     inputTamanho.setText(String.valueOf(petSelecionado.getPorteRaca()));
@@ -310,12 +326,21 @@ public class ListaPetController implements Initializable {
                     inputSexo.setText(String.valueOf(petSelecionado.getSexo()));
 
                 }
+
+                if (event.getClickCount() == 1) {
+                    Pet petSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
+
+                    Image imagem = convertByteArrayToImage(petSelecionado.getImagem());
+
+                    imgMostrar.setImage(imagem);
+
+                }
             }
         });
 
     }
 
-    @FXML
+/*     @FXML
     void imgMostrar() {
         tabListaTudo.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -330,7 +355,7 @@ public class ListaPetController implements Initializable {
                 }
             }
         });
-    }
+    } */
 
     private Image convertByteArrayToImage(byte[] byteArray) {
         try {
@@ -375,26 +400,48 @@ public class ListaPetController implements Initializable {
 
     }
 
+
     @FXML
-    void atualizarEdit(ActionEvent event) {
-        Pet itemSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
-        if (itemSelecionado != null) {
-            int idEdit = itemSelecionado.getId();
-            pet.setId(idEdit);
-            pet.setNome(inputNome.getText());
-            pet.setRaca(inputRaca.getText());
-            pet.setPorteRaca(inputTamanho.getText());
-            pet.setSexo(inputSexo.getText());
-            pet.setCor(inputCor.getText());
-            pet.setIdade(inputIdade.getText());
-            pet.setHistoria(inputHistoria.getText());
-            operacoesCRUD.atualizarRegistro(pet);
-            JOptionPane.showMessageDialog(null, "Atualizado!");
+void atualizarEdit(ActionEvent event) {
+    Pet itemSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
+    if (itemSelecionado != null) {
+        int idEdit = itemSelecionado.getId();
 
-            System.out.println("id" + idEdit);
+        String nome = inputNome.getText();
+        String raca = inputRaca.getText();
+        String porteRaca = inputTamanho.getText();
+        String sexo = inputSexo.getText();
+        String cor = inputCor.getText();
+        String idade = inputIdade.getText();
+        String historia = inputHistoria.getText();
+
+        if (nome.trim().isEmpty() ||
+            raca.trim().isEmpty() ||
+            porteRaca.trim().isEmpty() ||
+            sexo.trim().isEmpty() ||
+            cor.trim().isEmpty() ||
+            idade.trim().isEmpty() ||
+            historia.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Todos os campos são obrigatórios e não podem estar em branco.");
+            return;
         }
-    }
 
+        pet.setId(idEdit);
+        pet.setNome(nome);
+        pet.setRaca(raca);
+        pet.setPorteRaca(porteRaca);
+        pet.setSexo(sexo);
+        pet.setCor(cor);
+        pet.setIdade(idade);
+        pet.setHistoria(historia);
+
+
+        operacoesCRUD.atualizarRegistro(pet);
+        JOptionPane.showMessageDialog(null, "Atualizado!");
+
+        System.out.println("id" + idEdit);
+    }
+}
 
     private void popularComboBox() {
         ObservableList<String> opcoes = FXCollections.observableArrayList("Macho", "Femea");
@@ -406,7 +453,7 @@ public class ListaPetController implements Initializable {
         Pet itemSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
 
         if (itemSelecionado != null) {
-            int idParaExcluir = itemSelecionado.getId(); 
+            int idParaExcluir = itemSelecionado.getId();
             operacoesCRUD.excluirRegistro(idParaExcluir);
             tabListaTudo.getItems().remove(itemSelecionado);
             System.out.println(idParaExcluir);
