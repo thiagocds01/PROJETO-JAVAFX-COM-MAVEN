@@ -259,6 +259,15 @@ public class ListaPetController implements Initializable {
 
         JOptionPane.showMessageDialog(null, "Cadastrado!");
         operacoesCRUD.cadastrarRegistro(pet);
+
+        campoNome.setText("");
+        campoRaca.setText("");
+        campoPorteRaca.setText("");
+        campoSexo.setValue("");
+        campoCor.setText("");
+        campoDtNascimento.setValue("");
+        campoHistoria.setText("");
+
     }
 
     @FXML
