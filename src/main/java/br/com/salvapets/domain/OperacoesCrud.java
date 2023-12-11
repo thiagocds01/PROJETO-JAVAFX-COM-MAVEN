@@ -6,7 +6,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 
 public class OperacoesCrud {
 
@@ -86,8 +85,7 @@ public class OperacoesCrud {
                 stmt.executeUpdate();
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
-            ;
+            throw new RuntimeException("Erro ao atualizar pet : " + e.getMessage());
         }
     }
 

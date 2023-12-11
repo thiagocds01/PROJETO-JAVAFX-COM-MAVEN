@@ -1,10 +1,10 @@
 package br.com.salvapets.controller;
 
-import javafx.scene.layout.StackPane;
+import br.com.salvapets.domain.OperacoesCrud;
+import br.com.salvapets.domain.Pet;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,16 +12,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-
 import javax.swing.JOptionPane;
-
-import com.mysql.cj.jdbc.Blob;
-
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-
-import br.com.salvapets.domain.OperacoesCrud;
-import br.com.salvapets.domain.Pet;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -36,8 +29,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -72,9 +63,6 @@ public class ListaPetController implements Initializable {
     private TextField campoCor;
 
     @FXML
-    private TextField campoDtNascimento;
-
-    @FXML
     private TextArea campoHistoria;
 
     @FXML
@@ -88,6 +76,9 @@ public class ListaPetController implements Initializable {
 
     @FXML
     private ComboBox<String> campoSexo;
+
+    @FXML
+    private ComboBox<String> campoDtNascimento;
 
     @FXML
     private TableColumn<Pet, String> colCor;
@@ -177,7 +168,7 @@ public class ListaPetController implements Initializable {
     private TextField inputID;
 
     @FXML
-    private TextField inputIdade;
+    private ComboBox<String> inputIdade;
 
     @FXML
     private TextField inputNome;
@@ -186,7 +177,7 @@ public class ListaPetController implements Initializable {
     private TextField inputRaca;
 
     @FXML
-    private TextField inputSexo;
+    private ComboBox<String> inputSexo;
 
     @FXML
     private TextField inputTamanho;
@@ -196,20 +187,6 @@ public class ListaPetController implements Initializable {
 
     private OperacoesCrud operacoesCRUD = new OperacoesCrud();
     private Pet pet = new Pet();
-
-    @FXML
-    void handleAtualizarImagemUploadButtonAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void handlebuttonAtualizarLista(ActionEvent event) {
-
-        List<Pet> pets = operacoesCRUD.listarRegistros();
-        tabListaTudo.getItems().clear();
-        tabListaTudo.getItems().addAll(pets);
-
-    }
 
     @FXML
     void handleUploadButtonAction(ActionEvent event) {
@@ -245,7 +222,7 @@ public class ListaPetController implements Initializable {
         campoPorteRaca.setText("");
         campoSexo.setValue("");
         campoCor.setText("");
-        campoDtNascimento.setText("");
+        campoDtNascimento.setValue("");
         campoHistoria.setText("");
     }
 
@@ -256,7 +233,7 @@ public class ListaPetController implements Initializable {
         String porteRaca = campoPorteRaca.getText();
         String sexo = campoSexo.getValue();
         String cor = campoCor.getText();
-        String idade = campoDtNascimento.getText();
+        String idade = campoDtNascimento.getValue();
         String historia = campoHistoria.getText();
 
         if (nome.trim().isEmpty() ||
@@ -280,16 +257,24 @@ public class ListaPetController implements Initializable {
 
         System.out.println(pet.getImagem());
 
-
         JOptionPane.showMessageDialog(null, "Cadastrado!");
         operacoesCRUD.cadastrarRegistro(pet);
     }
 
+    @FXML
+    void handlebuttonAtualizarLista(ActionEvent event) {
+
+        List<Pet> pets = operacoesCRUD.listarRegistros();
+        tabListaTudo.getItems().clear();
+        tabListaTudo.getItems().addAll(pets);
+
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        popularComboBox();
+        popularComboBoxSexo();
+        popularComboBoxDtNascimento();
 
         List<Pet> pets = operacoesCRUD.listarRegistros();
 
@@ -306,9 +291,10 @@ public class ListaPetController implements Initializable {
         colSexo.setCellValueFactory(new PropertyValueFactory<Pet, String>("sexo"));
         colIdade.setCellValueFactory(new PropertyValueFactory<Pet, String>("idade"));
         colRaca.setCellValueFactory(new PropertyValueFactory<Pet, String>("raca"));
+        colHistoria.setCellValueFactory(new PropertyValueFactory<Pet, String>("historia"));
         colImagem.setCellValueFactory(new PropertyValueFactory<Pet, byte[]>("imagem"));
 
-        tabListaTudo.getColumns().addAll(colNome, colCor, colSexo, colIdade, colRaca, colImagem);
+        tabListaTudo.getColumns().addAll(colNome, colCor, colSexo, colIdade, colRaca, colHistoria);
 
         tabListaTudo.getItems().addAll(pets);
 
@@ -321,9 +307,9 @@ public class ListaPetController implements Initializable {
                     inputRaca.setText(String.valueOf(petSelecionado.getRaca()));
                     inputTamanho.setText(String.valueOf(petSelecionado.getPorteRaca()));
                     inputCor.setText(String.valueOf(petSelecionado.getCor()));
-                    inputIdade.setText(String.valueOf(petSelecionado.getIdade()));
+                    inputIdade.setValue(String.valueOf(petSelecionado.getIdade()));
                     inputHistoria.setText(String.valueOf(petSelecionado.getHistoria()));
-                    inputSexo.setText(String.valueOf(petSelecionado.getSexo()));
+                    inputSexo.setValue(String.valueOf(petSelecionado.getSexo()));
 
                 }
 
@@ -339,23 +325,6 @@ public class ListaPetController implements Initializable {
         });
 
     }
-
-/*     @FXML
-    void imgMostrar() {
-        tabListaTudo.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getClickCount() == 1) {
-                    Pet petSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
-
-                    Image imagem = convertByteArrayToImage(petSelecionado.getImagem());
-
-                    imgMostrar.setImage(imagem);
-
-                }
-            }
-        });
-    } */
 
     private Image convertByteArrayToImage(byte[] byteArray) {
         try {
@@ -400,52 +369,58 @@ public class ListaPetController implements Initializable {
 
     }
 
-
     @FXML
-void atualizarEdit(ActionEvent event) {
-    Pet itemSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
-    if (itemSelecionado != null) {
-        int idEdit = itemSelecionado.getId();
+    void atualizarEdit(ActionEvent event) {
+        Pet itemSelecionado = tabListaTudo.getSelectionModel().getSelectedItem();
+        if (itemSelecionado != null) {
+            int idEdit = itemSelecionado.getId();
 
-        String nome = inputNome.getText();
-        String raca = inputRaca.getText();
-        String porteRaca = inputTamanho.getText();
-        String sexo = inputSexo.getText();
-        String cor = inputCor.getText();
-        String idade = inputIdade.getText();
-        String historia = inputHistoria.getText();
+            String nome = inputNome.getText();
+            String raca = inputRaca.getText();
+            String porteRaca = inputTamanho.getText();
+            String sexo = inputSexo.getValue();
+            String cor = inputCor.getText();
+            String idade = inputIdade.getValue();
+            String historia = inputHistoria.getText();
 
-        if (nome.trim().isEmpty() ||
-            raca.trim().isEmpty() ||
-            porteRaca.trim().isEmpty() ||
-            sexo.trim().isEmpty() ||
-            cor.trim().isEmpty() ||
-            idade.trim().isEmpty() ||
-            historia.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Todos os campos são obrigatórios e não podem estar em branco.");
-            return;
+            if (nome.trim().isEmpty() ||
+                    raca.trim().isEmpty() ||
+                    porteRaca.trim().isEmpty() ||
+                    sexo.trim().isEmpty() ||
+                    cor.trim().isEmpty() ||
+                    idade.trim().isEmpty() ||
+                    historia.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Todos os campos são obrigatórios e não podem estar em branco.");
+                return;
+            }
+
+            pet.setId(idEdit);
+            pet.setNome(nome);
+            pet.setRaca(raca);
+            pet.setPorteRaca(porteRaca);
+            pet.setSexo(sexo);
+            pet.setCor(cor);
+            pet.setIdade(idade);
+            pet.setHistoria(historia);
+
+            operacoesCRUD.atualizarRegistro(pet);
+            JOptionPane.showMessageDialog(null, "Atualizado!");
+
+            System.out.println("id" + idEdit);
         }
-
-        pet.setId(idEdit);
-        pet.setNome(nome);
-        pet.setRaca(raca);
-        pet.setPorteRaca(porteRaca);
-        pet.setSexo(sexo);
-        pet.setCor(cor);
-        pet.setIdade(idade);
-        pet.setHistoria(historia);
-
-
-        operacoesCRUD.atualizarRegistro(pet);
-        JOptionPane.showMessageDialog(null, "Atualizado!");
-
-        System.out.println("id" + idEdit);
     }
-}
 
-    private void popularComboBox() {
+    private void popularComboBoxSexo() {
         ObservableList<String> opcoes = FXCollections.observableArrayList("Macho", "Femea");
         campoSexo.setItems(opcoes);
+        inputSexo.setItems(opcoes);
+    }
+
+    private void popularComboBoxDtNascimento() {
+        ObservableList<String> opcoes = FXCollections.observableArrayList("1 a 6 Meses", "6 a 12 Meses", "1 a 2 Anos",
+                "2 a 4 Anos", "Acima de 5 Anos");
+        campoDtNascimento.setItems(opcoes);
+        inputIdade.setItems(opcoes);
     }
 
     @FXML
