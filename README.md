@@ -10,7 +10,10 @@ O projeto está organizado da seguinte maneira:
 
 - **src**: Contém o código fonte do projeto.
   - **main**: Código principal da aplicação.
-  - **test**: Testes unitários, quando aplicável.
+    - **controller**: Classe onde foi criado os metodos da aplicação.
+    - **dao**: Classe onde foi configurado a conexão com banco de dados mysql.
+    - **domain**: Classes onde foi implementadas as operações de sql e classe de atributos .
+
 
 - **database**: Scripts SQL para a criação e inicialização do banco de dados MySQL.
 
@@ -19,6 +22,8 @@ O projeto está organizado da seguinte maneira:
 ## Tecnologias Utilizadas
 
 - **Java**: Linguagem de programação principal.
+
+- **Scene Builder**: Aplicação usada para criar a tela desktop.
 
 - **JavaFX**: Biblioteca gráfica para a criação da interface do usuário.
 
@@ -34,7 +39,28 @@ O projeto está organizado da seguinte maneira:
 
 ## Configuração do Banco de Dados
 
-1. Execute os scripts SQL na pasta `database` para criar e inicializar o banco de dados.
+1. 
+
+[
+  CREATE TABLE USUARIO (
+    id_usuario CHAR PRIMARY KEY
+);
+
+CREATE TABLE PET (
+    porte CHAR,
+    raca CHAR,
+    sexo BOOLEAN,
+    cor CHAR,
+    idade DATE,
+    historia_do_pet CHAR,
+    id_pet CHAR,
+    id_usuario CHAR,
+    foto BLOB,
+    PRIMARY KEY (id_pet, id_usuario)
+);
+
+]
+
 
 ## Executando o Projeto
 
@@ -58,4 +84,4 @@ O sistema possui as seguintes funcionalidades básicas:
 
 ## Conclusão
 
-Este projeto demonstra a aplicação prática dos conceitos aprendidos durante meu curso na faculdade, especialmente na área de engenharia de requisitos de software. Sinta-se à vontade para explorar o código fonte e contribuir para o desenvolvimento contínuo do projeto.
+Este projeto demonstra a aplicação prática dos conceitos aprendidos durante meu curso na faculdade, especialmente na área de engenharia de requisitos de software.
